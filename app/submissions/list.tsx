@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 type Submission = {
   report_id: string
@@ -53,7 +54,11 @@ export default function SubmissionsList({ submissions }: { submissions: Submissi
 
       <ul className="mt-4 space-y-2">
         {shown.map((s) => (
-          <li key={s.report_id} className="rounded-lg border border-gray-200 p-4">
+          <li key={s.report_id}>
+          <Link
+            href={`/submissions/${s.report_id}`}
+            className="block rounded-lg border border-gray-200 p-4 hover:border-gray-400 hover:bg-gray-50"
+          >
             <div className="flex items-center justify-between">
               <span className="font-medium">{s.title}</span>
               <span
@@ -67,7 +72,8 @@ export default function SubmissionsList({ submissions }: { submissions: Submissi
             <div className="mt-1 text-xs text-gray-500">
               {s.report_id} · {s.issue_type} · {s.priority} priority
             </div>
-          </li>
+          </Link>
+        </li>
         ))}
         {shown.length === 0 && (
           <li className="py-6 text-center text-sm text-gray-400">No submissions in this view.</li>
