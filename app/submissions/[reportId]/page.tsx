@@ -20,7 +20,20 @@ export default async function SubmissionDetailPage({
     .single()
 
   if (!s) notFound()
+// List photos stored under this submission's folder, and sign them for viewing
+  const { data: files } = await supabase.storage
+    .from('submission-photos')
+    .list(s.report_id, { sortBy: { column: 'name', order: 'asc' } })
 
+  const photoUrls: string[] = []
+  if (files && files.length > 0) {
+    for (const file of files) {
+      const { data: signed } = await supabase.storage
+        .from('submission-photos')
+        .createSignedUrl(`${s.report_id}/${file.name}`, 3600) // valid 1 hour
+      if (signed?.signedUrl) photoUrls.push(signed.signedUrl)
+    }
+  }
   return (
     <main className="mx-auto max-w-2xl p-6">
       <Link href="/submissions" className="text-sm text-gray-500 hover:underline">
@@ -67,6 +80,23 @@ export default async function SubmissionDetailPage({
         assigneeGroup={s.assignee_group}
         requiresBid={s.requires_bid}
       />
+      {photoUrls.length > 0 && (
+        <div className="mt-8">
+          <h2 className="font-semibold">Photos</h2>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            {photoUrls.map((url, i) => (
+              <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Submission photo ${i + 1}`}
+                  className="h-40 w-full rounded-lg border border-gray-200 object-cover"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </main>
   )
 }

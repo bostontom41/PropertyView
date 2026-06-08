@@ -8,36 +8,31 @@ export async function createSubmission(formData: {
   priority: string
   location: string
   notes: string
+  photos: { name: string; type: string; base64: string }[]
 }) {
   const supabase = await createClient()
 
-// Who is this user, and what property are they tied to?
-const { data: claims } = await supabase.auth.getClaims()
-const userId = claims?.claims?.sub
+  const { data: claims } = await supabase.auth.getClaims()
+  const userId = claims?.claims?.sub
 
-const { data: profile } = await supabase
-  .from('profiles')
-  .select('role, property_id')
-  .eq('id', userId)
-  .single()
-  if (!profile) {
-    return { error: 'No profile found for your account.' }
-  }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, property_id')
+    .eq('id', userId)
+    .single()
 
-  // Scoped roles file against their own property; global roles must pick one.
-  // For now (admin/regional with no property), fall back to the first property.
+  if (!profile) return { error: 'No profile found for your account.' }
+
   let propertyId = profile.property_id
   if (!propertyId) {
     const { data: firstProp } = await supabase
       .from('properties').select('id').order('name').limit(1).single()
     propertyId = firstProp?.id ?? null
   }
+  if (!propertyId) return { error: 'No property available to file against.' }
 
-  if (!propertyId) {
-    return { error: 'No property available to file against.' }
-  }
-
-  const { data, error } = await supabase
+  // 1. Create the submission row (trigger generates report_id)
+  const { data: created, error } = await supabase
     .from('submissions')
     .insert({
       property_id: propertyId,
@@ -51,5 +46,24 @@ const { data: profile } = await supabase
     .single()
 
   if (error) return { error: error.message }
-  return { reportId: data.report_id }
+  const reportId = created.report_id
+
+  // 2. Upload each photo into a folder named after the report_id
+  for (let i = 0; i < formData.photos.length; i++) {
+    const photo = formData.photos[i]
+    const buffer = Buffer.from(photo.base64, 'base64')
+    const ext = photo.name.split('.').pop() || 'jpg'
+    const path = `${reportId}/${Date.now()}-${i}.${ext}`
+
+    const { error: upErr } = await supabase.storage
+      .from('submission-photos')
+      .upload(path, buffer, { contentType: photo.type })
+
+    if (upErr) {
+      // Submission saved, but a photo failed — report it, don't lose the ticket
+      return { reportId, photoError: upErr.message }
+    }
+  }
+
+  return { reportId }
 }

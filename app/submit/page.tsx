@@ -20,16 +20,40 @@ export default function SubmitPage() {
   const [priority, setPriority] = useState('medium')
   const [location, setLocation] = useState('')
   const [notes, setNotes] = useState('')
+  const [photos, setPhotos] = useState<{ name: string; type: string; base64: string }[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ reportId?: string; error?: string } | null>(null)
+  function readFileAsBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result as string
+        resolve(result.split(',')[1]) // strip the "data:image/...;base64," prefix
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  async function handlePhotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? [])
+    const encoded = await Promise.all(
+      files.map(async (f) => ({
+        name: f.name,
+        type: f.type,
+        base64: await readFileAsBase64(f),
+      }))
+    )
+    setPhotos((prev) => [...prev, ...encoded])
+  }
   async function handleSubmit() {
     setSubmitting(true)
     setResult(null)
-    const res = await createSubmission({ title, issueType, priority, location, notes })
+    const res = await createSubmission({ title, issueType, priority, location, notes, photos })
     setResult(res)
     setSubmitting(false)
     if (res.reportId) {
-      setTitle(''); setIssueType(''); setPriority('medium'); setLocation(''); setNotes('')
+      setTitle(''); setIssueType(''); setPriority('medium'); setLocation(''); setNotes(''); setPhotos([])
     }
   }
   return (
@@ -110,7 +134,22 @@ export default function SubmitPage() {
             className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
           />
         </div>
-
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Photos</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            capture="environment"
+            onChange={handlePhotos}
+            className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-900 file:px-3 file:py-2 file:text-white"
+          />
+          {photos.length > 0 && (
+            <p className="mt-2 text-sm text-gray-500">
+              {photos.length} photo{photos.length > 1 ? 's' : ''} ready to upload
+            </p>
+          )}
+        </div>
         <button
           type="button"
           onClick={handleSubmit}
