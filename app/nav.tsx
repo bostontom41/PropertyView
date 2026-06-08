@@ -4,34 +4,38 @@ import { signOut } from '@/lib/actions'
 
 export default async function Nav() {
   const user = await getCurrentUser()
-  if (!user) return null // no nav on login/logged-out pages
+  if (!user) return null
 
   const isPortal = canAccessPortal(user.role)
 
+  const linkClass = 'text-sm text-white/70 hover:text-white transition-colors'
+
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="bg-brand text-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <div className="flex items-center gap-6">
-          <span className="font-bold text-gray-900">Homeside PropertyView</span>
-          <nav className="flex gap-4 text-sm">
+          <span className="font-bold">
+            Homeside <span className="text-accent">PropertyView</span>
+          </span>
+          <nav className="flex gap-5">
             {isPortal ? (
               <>
-              <Link href="/portal" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
-              <Link href="/submissions" className="text-gray-600 hover:text-gray-900">Submissions</Link>
-              <Link href="/portal/properties" className="text-gray-600 hover:text-gray-900">Properties</Link>
-              <Link href="/submit" className="text-gray-600 hover:text-gray-900">New</Link>
-            </>
+                <Link href="/portal" className={linkClass}>Dashboard</Link>
+                <Link href="/submissions" className={linkClass}>Submissions</Link>
+                <Link href="/portal/properties" className={linkClass}>Properties</Link>
+                <Link href="/submit" className={linkClass}>New</Link>
+              </>
             ) : (
               <>
-                <Link href="/submissions" className="text-gray-600 hover:text-gray-900">My Tickets</Link>
-                <Link href="/submit" className="text-gray-600 hover:text-gray-900">New Submission</Link>
+                <Link href="/submissions" className={linkClass}>My Tickets</Link>
+                <Link href="/submit" className={linkClass}>New Submission</Link>
               </>
             )}
           </nav>
         </div>
-        <form action={signOut}>
-          <span className="mr-3 text-xs text-gray-500">{user.email}</span>
-          <button className="rounded-lg border border-gray-300 px-3 py-1 text-sm hover:bg-gray-50">
+        <form action={signOut} className="flex items-center gap-3">
+          <span className="text-xs text-white/60">{user.email}</span>
+          <button className="rounded-lg border border-white/25 px-3 py-1 text-sm text-white hover:bg-white/10 transition-colors">
             Sign out
           </button>
         </form>

@@ -9,29 +9,18 @@ export async function createSubmission(formData: {
   location: string
   notes: string
   photos: { name: string; type: string; base64: string }[]
+  propertyId?: string | null
 }) {
   const supabase = await createClient()
 
-  const { data: claims } = await supabase.auth.getClaims()
-  const userId = claims?.claims?.sub
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, property_id')
-    .eq('id', userId)
-    .single()
-
-  if (!profile) return { error: 'No profile found for your account.' }
-
-  let propertyId = profile.property_id
+  const propertyId = formData.propertyId
   if (!propertyId) {
-    const { data: firstProp } = await supabase
-      .from('properties').select('id').order('name').limit(1).single()
-    propertyId = firstProp?.id ?? null
+    return { error: 'No property specified. Start a submission from a property page.' }
   }
-  if (!propertyId) return { error: 'No property available to file against.' }
 
-  // 1. Create the submission row (trigger generates report_id)
+  // 1. Create the submission row (trigger generates report_id).
+  //    RLS rejects this insert if the user isn't allowed to file for this property,
+  //    so the database is the access gate — no need to re-check here.
   const { data: created, error } = await supabase
     .from('submissions')
     .insert({
@@ -60,7 +49,6 @@ export async function createSubmission(formData: {
       .upload(path, buffer, { contentType: photo.type })
 
     if (upErr) {
-      // Submission saved, but a photo failed — report it, don't lose the ticket
       return { reportId, photoError: upErr.message }
     }
   }

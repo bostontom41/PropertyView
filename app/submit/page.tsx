@@ -1,6 +1,6 @@
 'use client'
-
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createSubmission } from './actions'
 
 const ISSUE_TYPES = [
@@ -14,7 +14,9 @@ const ISSUE_TYPES = [
   { value: 'other', label: '📋 Other' },
 ]
 
-export default function SubmitPage() {
+function SubmitForm() {
+  const searchParams = useSearchParams()
+  const propertyId = searchParams.get('property')
   const [title, setTitle] = useState('')
   const [issueType, setIssueType] = useState('')
   const [priority, setPriority] = useState('medium')
@@ -49,7 +51,7 @@ export default function SubmitPage() {
   async function handleSubmit() {
     setSubmitting(true)
     setResult(null)
-    const res = await createSubmission({ title, issueType, priority, location, notes, photos })
+    const res = await createSubmission({ title, issueType, priority, location, notes, photos, propertyId })
     setResult(res)
     setSubmitting(false)
     if (res.reportId) {
@@ -169,5 +171,12 @@ export default function SubmitPage() {
         )}
       </div>
     </main>
+  )
+}
+export default function SubmitPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading…</div>}>
+      <SubmitForm />
+    </Suspense>
   )
 }
