@@ -1,18 +1,18 @@
-import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { getCurrentUser, canAccessPortal } from '@/lib/auth'
+
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
-  const email = data?.claims?.email
+  const user = await getCurrentUser()
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-4xl font-bold">Hello Homeside 👋</h1>
-      {email ? (
-        <p className="text-green-600">Signed in as {email}</p>
-      ) : (
-        <p className="text-gray-500">Not signed in</p>
-      )}
-    </main>
-  )
+  // Not logged in → login page
+  if (!user) redirect('/login')
+
+  // Manager and above → web portal; Field → mobile submissions list
+  if (canAccessPortal(user.role)) {
+    redirect('/portal/properties')
+  } else {
+    redirect('/submissions')
+  }
 }

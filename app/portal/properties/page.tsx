@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { signOut } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,13 +11,7 @@ export default async function PropertiesPage() {
   return (
     <main className="mx-auto max-w-2xl p-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Properties</h1>
-        <form action={signOut}>
-          <span className="mr-3 text-sm text-gray-500">{claims?.claims?.email}</span>
-          <button className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50">
-            Sign out
-          </button>
-        </form>
+      <h1 className="text-2xl font-bold">Properties</h1>
       </div>
 
       <ul className="mt-6 space-y-3">
