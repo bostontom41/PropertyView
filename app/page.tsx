@@ -11,7 +11,7 @@ export default async function Home() {
 
   // Manager and above → web portal; Field → mobile submissions list
   if (canAccessPortal(user.role)) {
-    redirect('/portal/properties')
+    redirect('/portal')
   } else {
     redirect('/submissions')
   }

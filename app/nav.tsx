@@ -16,10 +16,11 @@ export default async function Nav() {
           <nav className="flex gap-4 text-sm">
             {isPortal ? (
               <>
-                <Link href="/portal/properties" className="text-gray-600 hover:text-gray-900">Properties</Link>
-                <Link href="/submissions" className="text-gray-600 hover:text-gray-900">Submissions</Link>
-                <Link href="/submit" className="text-gray-600 hover:text-gray-900">New</Link>
-              </>
+              <Link href="/portal" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+              <Link href="/submissions" className="text-gray-600 hover:text-gray-900">Submissions</Link>
+              <Link href="/portal/properties" className="text-gray-600 hover:text-gray-900">Properties</Link>
+              <Link href="/submit" className="text-gray-600 hover:text-gray-900">New</Link>
+            </>
             ) : (
               <>
                 <Link href="/submissions" className="text-gray-600 hover:text-gray-900">My Tickets</Link>
