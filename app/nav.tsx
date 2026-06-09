@@ -5,7 +5,7 @@ import { signOut } from '@/lib/actions'
 export default async function Nav() {
   const user = await getCurrentUser()
   if (!user) return null
-
+  if (canAccessPortal(user.role)) return null
   const isPortal = canAccessPortal(user.role)
 
   const linkClass = 'text-sm text-white/70 hover:text-white transition-colors'
@@ -23,7 +23,6 @@ export default async function Nav() {
                 <Link href="/portal" className={linkClass}>Dashboard</Link>
                 <Link href="/submissions" className={linkClass}>Submissions</Link>
                 <Link href="/portal/properties" className={linkClass}>Properties</Link>
-                <Link href="/submit" className={linkClass}>New</Link>
               </>
             ) : (
               <>

@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { formatFiled, propertyPhotoUrl } from '@/lib/format'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import PhotoUpload from './photo-upload'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,11 +23,13 @@ export default async function PropertyDetailPage({
 
   const { data: property } = await supabase
     .from('properties')
-    .select('id, name, address, manager_email')
+    .select('id, name, address, manager_email, photo_path')
     .eq('id', id)
     .single()
 
   if (!property) notFound()
+
+  const photoUrl = propertyPhotoUrl(property.photo_path)
 
   const { data: tickets } = await supabase
     .from('submissions')
@@ -40,6 +44,17 @@ export default async function PropertyDetailPage({
       <Link href="/portal/properties" className="text-sm text-gray-500 hover:underline">
         ← All properties
       </Link>
+      <div className="mt-3">
+        <PhotoUpload propertyId={property.id} />
+      </div>
+
+      {photoUrl && (
+        <img
+          src={photoUrl}
+          alt={property.name}
+          className="mt-4 h-48 w-full rounded-xl border border-gray-200 object-cover"
+        />
+      )}
 
       <div className="mt-3 flex items-start justify-between">
         <div>
@@ -80,7 +95,7 @@ export default async function PropertyDetailPage({
                 </span>
               </div>
               <div className="mt-1 text-xs text-gray-500">
-                {t.report_id} · {t.issue_type} · {t.priority} priority
+                {t.report_id} · {t.issue_type} · {t.priority} priority · {formatFiled(t.created_at)}
               </div>
             </Link>
           </li>

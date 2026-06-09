@@ -1,3 +1,4 @@
+import { formatFiled } from '@/lib/format'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
@@ -73,7 +74,7 @@ export default async function DashboardPage() {
                     {s.status.replace('_', ' ')}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-gray-500">{new Date(s.created_at).toLocaleDateString()}</td>
+                <td className="px-4 py-3 text-gray-500">{formatFiled(s.created_at)}</td>
               </tr>
             ))}
             {recent.length === 0 && (
