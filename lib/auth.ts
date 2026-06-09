@@ -5,6 +5,7 @@ export type CurrentUser = {
   email: string | null
   role: 'field' | 'manager' | 'regional' | 'admin'
   propertyId: string | null
+  fullName: string | null
 }
 
 /**
@@ -20,17 +21,17 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, email, role, property_id')
+    .select('id, email, role, property_id, full_name')
     .eq('id', userId)
     .single()
 
   if (!profile) return null
-
   return {
     id: profile.id,
     email: profile.email,
     role: profile.role,
     propertyId: profile.property_id,
+    fullName: profile.full_name,
   }
 }
 

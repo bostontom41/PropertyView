@@ -46,29 +46,29 @@ export default async function DashboardPage() {
       </div>
 
       <h2 className="mt-10 font-semibold">Recent Submissions</h2>
-      <div className="mt-3 overflow-x-auto rounded-xl border border-gray-200 bg-white">
+      <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-gray-200 text-left text-gray-500">
-              <th className="px-4 py-3 font-medium">Report</th>
-              <th className="px-4 py-3 font-medium">Title</th>
-              <th className="px-4 py-3 font-medium">Property</th>
-              <th className="px-4 py-3 font-medium">Priority</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Created</th>
+          <thead className="bg-gray-50">
+            <tr className="text-left">
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Report</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Title</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Property</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Priority</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Status</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-gray-500">Created</th>
             </tr>
           </thead>
           <tbody>
             {recent.map((s) => (
-              <tr key={s.report_id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
+              <tr key={s.report_id} className="border-t border-gray-100 hover:bg-gray-50">
                 <td className="px-4 py-3">
-                  <TicketLink reportId={s.report_id} className="cursor-pointer font-medium text-gray-900 hover:underline" />
+                  <TicketLink reportId={s.report_id} className="cursor-pointer font-mono text-xs font-medium text-gray-500 hover:text-brand hover:underline" />
                 </td>
-                <td className="px-4 py-3">{s.title}</td>
+                <td className="px-4 py-3 font-medium text-gray-900">{s.title}</td>
                 <td className="px-4 py-3 text-gray-600">{propName.get(s.property_id) ?? '—'}</td>
-                <td className="px-4 py-3 capitalize">{s.priority}</td>
+                <td className="px-4 py-3 capitalize text-gray-600">{s.priority}</td>
                 <td className="px-4 py-3">
-                  <span className={`rounded-full px-2 py-0.5 text-xs capitalize ${STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'}`}>
                     {s.status.replace('_', ' ')}
                   </span>
                 </td>

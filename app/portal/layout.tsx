@@ -12,7 +12,7 @@ export default async function PortalLayout({ children }: { children: React.React
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar email={user.email} role={user.role} />
+      <Sidebar email={user.email} role={user.role} name={user.fullName} />
       <div className="flex-1"><DrawerProvider>{children}</DrawerProvider></div>
     </div>
   )

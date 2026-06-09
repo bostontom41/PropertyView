@@ -3,42 +3,65 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/actions'
+import {
+  LayoutDashboard,
+  FileText,
+  Building2,
+  Map,
+  GitBranch,
+  Users,
+  BarChart3,
+  Settings,
+  type LucideIcon,
+} from 'lucide-react'
 
-const OPERATIONS = [
-  { href: '/portal', label: 'Dashboard', exact: true },
-  { href: '/portal/submissions', label: 'Submissions' },
-  { href: '/portal/properties', label: 'Properties' },
+const OPERATIONS: { href: string; label: string; icon: LucideIcon; exact?: boolean }[] = [
+  { href: '/portal', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/portal/submissions', label: 'Submissions', icon: FileText },
+  { href: '/portal/properties', label: 'Properties', icon: Building2 },
 ]
 
-export default function Sidebar({ email, role }: { email: string | null; role: string }) {
+const CONFIGURE_PLACEHOLDERS: { label: string; icon: LucideIcon }[] = [
+  { label: 'Routing Rules', icon: GitBranch },
+  { label: 'Team & Roles', icon: Users },
+  { label: 'Reports', icon: BarChart3 },
+  { label: 'Settings', icon: Settings },
+]
+
+export default function Sidebar({ email, role, name }: { email: string | null; role: string; name?: string | null }) {
   const pathname = usePathname()
   const active = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/')
 
-  const initials = (email ?? '?').slice(0, 2).toUpperCase()
+  const displayName = name || email || 'User'
+  const initials = name
+    ? name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
+    : (email ?? '?').slice(0, 2).toUpperCase()
 
-  const navItem = (href: string, label: string, exact?: boolean) => (
+  const navItem = (href: string, label: string, Icon: LucideIcon, exact?: boolean) => (
     <Link
       key={href}
       href={href}
-      className={`relative block rounded-lg px-3 py-2 text-sm transition-colors ${
+      className={`relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
         active(href, exact) ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'
       }`}
     >
       {active(href, exact) && (
         <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r bg-accent" />
       )}
+      <Icon size={18} strokeWidth={2} className="flex-shrink-0" />
       {label}
     </Link>
   )
 
-  const placeholder = (label: string) => (
+  const placeholder = (label: string, Icon: LucideIcon) => (
     <div
       key={label}
       title="Coming soon"
-      className="flex cursor-default select-none items-center justify-between rounded-lg px-3 py-2 text-sm text-white/35"
+      className="flex cursor-default select-none items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/35"
     >
-      <span>{label}</span>
+      <Icon size={18} strokeWidth={2} className="flex-shrink-0" />
+      <span className="flex-1">{label}</span>
       <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white/50">
         Soon
       </span>
@@ -57,15 +80,12 @@ export default function Sidebar({ email, role }: { email: string | null; role: s
       <nav className="flex-1 space-y-6 px-3">
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Operations</div>
-          {OPERATIONS.map((i) => navItem(i.href, i.label, i.exact))}
-          {placeholder('Map View')}
+          {OPERATIONS.map((i) => navItem(i.href, i.label, i.icon, i.exact))}
+          {placeholder('Map View', Map)}
         </div>
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Configure</div>
-          {placeholder('Routing Rules')}
-          {placeholder('Team & Roles')}
-          {placeholder('Reports')}
-          {placeholder('Settings')}
+          {CONFIGURE_PLACEHOLDERS.map((p) => placeholder(p.label, p.icon))}
         </div>
       </nav>
 
@@ -75,7 +95,7 @@ export default function Sidebar({ email, role }: { email: string | null; role: s
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm">{email}</div>
+            <div className="truncate text-sm">{displayName}</div>
             <div className="text-xs capitalize text-white/50">{role}</div>
           </div>
         </div>
