@@ -46,9 +46,29 @@ export async function POST(
     const userId = claims?.claims?.sub ?? null
   
     if (body.action === 'triage') {
+      // Read current values so we can describe the change
+      const { data: before } = await supabase
+        .from('submissions').select('status, assignee_group').eq('report_id', reportId).single()
+  
       const { error } = await supabase
         .from('submissions').update(body.updates).eq('report_id', reportId)
       if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  
+      // Log a feed event for status or assignment changes (not requires_bid alone)
+      let eventKind: string | null = null
+      let eventBody: string | null = null
+      if (body.updates.status && body.updates.status !== before?.status) {
+        eventKind = 'status_change'
+        eventBody = `Status changed from ${(before?.status ?? 'new').replace('_', ' ')} to ${body.updates.status.replace('_', ' ')}`
+      } else if (body.updates.assignee_group && body.updates.assignee_group !== before?.assignee_group) {
+        eventKind = 'assignment_change'
+        eventBody = `Assigned to ${body.updates.assignee_group}`
+      }
+      if (eventKind && eventBody) {
+        await supabase.from('submission_notes').insert({
+          submission_id: s.id, author_id: userId, kind: eventKind, body: eventBody,
+        })
+      }
     } else if (body.action === 'note') {
       const { error } = await supabase.from('submission_notes').insert({
         submission_id: s.id, author_id: userId, kind: 'comment', body: body.text,

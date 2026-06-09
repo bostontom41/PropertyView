@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { formatFiled } from '@/lib/format'
 
 type DrawerContextType = { open: (reportId: string) => void; close: () => void }
@@ -13,9 +14,9 @@ export function useDrawer() {
 }
 
 export function TicketLink({ reportId, className, children }: { reportId: string; className?: string; children?: ReactNode }) {
-    const { open } = useDrawer()
-    return <button type="button" onClick={() => open(reportId)} className={className}>{children ?? reportId}</button>
-  }
+  const { open } = useDrawer()
+  return <button type="button" onClick={() => open(reportId)} className={className}>{children ?? reportId}</button>
+}
 
 const STATUS_STYLE: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
@@ -32,6 +33,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false)
   const [noteText, setNoteText] = useState('')
   const [busy, setBusy] = useState(false)
+  const router = useRouter()
 
   const load = useCallback(async (id: string) => {
     setLoading(true)
@@ -56,6 +58,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ action: 'triage', updates }),
     })
     await load(reportId)
+    router.refresh()
     setBusy(false)
   }
 
@@ -69,6 +72,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
     })
     setNoteText('')
     await load(reportId)
+    router.refresh()
     setBusy(false)
   }
 
