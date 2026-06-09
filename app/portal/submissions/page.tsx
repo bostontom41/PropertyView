@@ -22,7 +22,7 @@ export default async function PortalSubmissionsPage() {
     <main className="mx-auto max-w-2xl p-6">
       <h1 className="text-xl font-bold">Submissions</h1>
       <p className="mt-1 text-sm text-gray-500">Issues across your properties, newest first.</p>
-      <SubmissionsList submissions={submissions} />
+      <SubmissionsList submissions={submissions} useDrawerLinks />
     </main>
   )
 }

@@ -18,9 +18,10 @@ export async function createSubmission(formData: {
     return { error: 'No property specified. Start a submission from a property page.' }
   }
 
+  const { data: claims } = await supabase.auth.getClaims()
+  const userId = claims?.claims?.sub ?? null
+
   // 1. Create the submission row (trigger generates report_id).
-  //    RLS rejects this insert if the user isn't allowed to file for this property,
-  //    so the database is the access gate — no need to re-check here.
   const { data: created, error } = await supabase
     .from('submissions')
     .insert({
@@ -31,11 +32,23 @@ export async function createSubmission(formData: {
       location: formData.location || null,
       notes: formData.notes || null,
     })
-    .select('report_id')
+    .select('id, report_id')
     .single()
 
   if (error) return { error: error.message }
+  const submissionId = created.id
   const reportId = created.report_id
+
+  // 1b. Write the description as the first note — the "creation" entry.
+  if (formData.notes && formData.notes.trim().length > 0) {
+    const { error: noteErr } = await supabase.from('submission_notes').insert({
+      submission_id: submissionId,
+      author_id: userId,
+      kind: 'creation',
+      body: formData.notes.trim(),
+    })
+    if (noteErr) console.error('Failed to write creation note:', noteErr.message)
+  }
 
   // 2. Upload each photo into a folder named after the report_id
   for (let i = 0; i < formData.photos.length; i++) {

@@ -1,13 +1,13 @@
 import { formatFiled } from '@/lib/format'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { TicketLink } from './drawer-context'
 
 export const dynamic = 'force-dynamic'
 
 const STATUS_STYLE: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
   in_progress: 'bg-amber-100 text-amber-700',
-  bid_process: 'bg-purple-100 text-purple-700',
+  bid_process: 'bg-teal-100 text-teal-700',
   resolved: 'bg-green-100 text-green-700',
 }
 
@@ -55,16 +55,14 @@ export default async function DashboardPage() {
               <th className="px-4 py-3 font-medium">Property</th>
               <th className="px-4 py-3 font-medium">Priority</th>
               <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Filed</th>
+              <th className="px-4 py-3 font-medium">Created</th>
             </tr>
           </thead>
           <tbody>
             {recent.map((s) => (
               <tr key={s.report_id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50">
                 <td className="px-4 py-3">
-                  <Link href={`/submissions/${s.report_id}`} className="font-medium text-gray-900 hover:underline">
-                    {s.report_id}
-                  </Link>
+                  <TicketLink reportId={s.report_id} className="cursor-pointer font-medium text-gray-900 hover:underline" />
                 </td>
                 <td className="px-4 py-3">{s.title}</td>
                 <td className="px-4 py-3 text-gray-600">{propName.get(s.property_id) ?? '—'}</td>

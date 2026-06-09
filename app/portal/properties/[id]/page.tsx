@@ -3,6 +3,7 @@ import { formatFiled, propertyPhotoUrl } from '@/lib/format'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import PhotoUpload from './photo-upload'
+import { TicketLink } from '../../drawer-context'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,9 +85,9 @@ export default async function PropertyDetailPage({
       <ul className="mt-3 space-y-2">
         {(tickets ?? []).map((t) => (
           <li key={t.report_id}>
-            <Link
-              href={`/submissions/${t.report_id}`}
-              className="block rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-400"
+            <TicketLink
+              reportId={t.report_id}
+              className="block w-full text-left rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-400"
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium">{t.title}</span>
@@ -97,7 +98,7 @@ export default async function PropertyDetailPage({
               <div className="mt-1 text-xs text-gray-500">
                 {t.report_id} · {t.issue_type} · {t.priority} priority · {formatFiled(t.created_at)}
               </div>
-            </Link>
+            </TicketLink>
           </li>
         ))}
         {(tickets ?? []).length === 0 && (

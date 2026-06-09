@@ -1,5 +1,5 @@
 'use client'
-
+import { TicketLink } from '@/app/portal/drawer-context'
 import { useState } from 'react'
 import Link from 'next/link'
 import { formatFiled } from '@/lib/format'
@@ -35,9 +35,45 @@ function initials(name?: string | null): string {
   return name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 }
 
-export default function SubmissionsList({ submissions }: { submissions: Submission[] }) {
+function RowContent({ s }: { s: Submission }) {
+  return (
+    <>
+      {s.property_photo ? (
+        <img
+          src={s.property_photo}
+          alt={s.property_name ?? ''}
+          className="h-12 w-12 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+        />
+      ) : (
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-brand text-sm font-medium text-white">
+          {initials(s.property_name)}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate font-medium">{s.title}</span>
+          <span
+            className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs capitalize ${
+              STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {s.status.replace('_', ' ')}
+          </span>
+        </div>
+        <div className="mt-0.5 text-sm text-gray-700">{s.property_name ?? '—'}</div>
+        <div className="mt-0.5 text-xs text-gray-500">
+          {s.report_id} · {s.issue_type} · {s.priority} priority · {formatFiled(s.created_at)}
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default function SubmissionsList({ submissions, useDrawerLinks = false }: { submissions: Submission[]; useDrawerLinks?: boolean }) {
   const [filter, setFilter] = useState('all')
   const shown = filter === 'all' ? submissions : submissions.filter((s) => s.status === filter)
+
+  const rowClass = 'flex w-full items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 text-left hover:border-gray-400 hover:bg-gray-50'
 
   return (
     <div>
@@ -59,38 +95,15 @@ export default function SubmissionsList({ submissions }: { submissions: Submissi
       <ul className="mt-4 space-y-2">
         {shown.map((s) => (
           <li key={s.report_id}>
-            <Link
-              href={`/submissions/${s.report_id}`}
-              className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 hover:border-gray-400 hover:bg-gray-50"
-            >
-              {s.property_photo ? (
-                <img
-                  src={s.property_photo}
-                  alt={s.property_name ?? ''}
-                  className="h-12 w-12 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
-                />
-              ) : (
-                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-brand text-sm font-medium text-white">
-                  {initials(s.property_name)}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate font-medium">{s.title}</span>
-                  <span
-                    className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs capitalize ${
-                      STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {s.status.replace('_', ' ')}
-                  </span>
-                </div>
-                <div className="mt-0.5 text-sm text-gray-700">{s.property_name ?? '—'}</div>
-                <div className="mt-0.5 text-xs text-gray-500">
-                  {s.report_id} · {s.issue_type} · {s.priority} priority · {formatFiled(s.created_at)}
-                </div>
-              </div>
-            </Link>
+            {useDrawerLinks ? (
+              <TicketLink reportId={s.report_id} className={rowClass}>
+                <RowContent s={s} />
+              </TicketLink>
+            ) : (
+              <Link href={`/submissions/${s.report_id}`} className={rowClass}>
+                <RowContent s={s} />
+              </Link>
+            )}
           </li>
         ))}
         {shown.length === 0 && (
