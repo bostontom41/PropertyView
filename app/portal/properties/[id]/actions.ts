@@ -29,3 +29,11 @@ export async function uploadPropertyPhoto(
   revalidatePath(`/portal/properties/${propertyId}`)
   return { ok: true }
 }
+
+export async function updateProperty(id: string, updates: Record<string, any>) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('properties').update(updates).eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/properties/${id}`)
+  return { ok: true }
+}

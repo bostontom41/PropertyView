@@ -85,7 +85,7 @@ function SubmitForm() {
                 onClick={() => setIssueType(t.value)}
                 className={`rounded-lg border px-3 py-2 text-left text-sm ${
                   issueType === t.value
-                    ? 'border-gray-900 bg-gray-900 text-white'
+                    ? 'border-brand bg-brand text-white'
                     : 'border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -105,7 +105,7 @@ function SubmitForm() {
                 onClick={() => setPriority(p)}
                 className={`flex-1 rounded-lg border px-3 py-2 text-sm capitalize ${
                   priority === p
-                    ? 'border-gray-900 bg-gray-900 text-white'
+                    ? 'border-brand bg-brand text-white'
                     : 'border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -144,7 +144,7 @@ function SubmitForm() {
             multiple
             capture="environment"
             onChange={handlePhotos}
-            className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-gray-900 file:px-3 file:py-2 file:text-white"
+            className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:text-white"
           />
           {photos.length > 0 && (
             <p className="mt-2 text-sm text-gray-500">
@@ -156,15 +156,34 @@ function SubmitForm() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting || title.length === 0 || issueType.length === 0 || notes.trim().length === 0}
-          className="w-full rounded-lg bg-gray-900 px-4 py-3 font-medium text-white hover:bg-gray-800 disabled:opacity-50"
+          className="w-full rounded-lg bg-brand px-4 py-3 font-medium text-white hover:bg-brand-hover disabled:opacity-50"
         >
           {submitting ? 'Submitting…' : 'Submit Report'}
         </button>
 
         {result?.reportId && (
-          <p className="text-sm text-green-600">
-            Submitted — report {result.reportId}
-          </p>
+          <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+            <p className="text-sm font-medium text-green-700">
+              Submitted — report {result.reportId}
+            </p>
+            <div className="mt-3 flex justify-center gap-2">
+              {propertyId && (
+                
+                  href={`/portal/properties/${propertyId}`}
+                  className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover"
+                >
+                  View Property
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={() => setResult(null)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50"
+              >
+                File Another
+              </button>
+            </div>
+          </div>
         )}
         {result?.error && (
           <p className="text-sm text-red-600">Error: {result.error}</p>
