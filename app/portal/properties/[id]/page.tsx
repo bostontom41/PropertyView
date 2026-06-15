@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getCurrentUser } from '@/lib/auth'
 import PhotoUpload from './photo-upload'
 import OverviewTab from './overview'
+import ContactsTab from './contacts'
 import PropertyTabs from './tabs'
 import { TicketLink } from '../../drawer-context'
 
@@ -42,6 +43,13 @@ export default async function PropertyDetailPage({
     .select('report_id, title, issue_type, priority, status, created_at')
     .eq('property_id', id)
     .order('created_at', { ascending: false })
+
+  const { data: contacts } = await supabase
+    .from('property_contacts')
+    .select('id, name, role, phone, email, is_primary, notes')
+    .eq('property_id', id)
+    .order('is_primary', { ascending: false })
+    .order('name')
 
   const open = (tickets ?? []).filter((t) => t.status !== 'resolved').length
 
@@ -116,6 +124,7 @@ export default async function PropertyDetailPage({
       <PropertyTabs
         overview={<OverviewTab property={property} canEdit={isAdmin} />}
         tickets={ticketsContent}
+        contacts={<ContactsTab propertyId={property.id} contacts={contacts ?? []} canManage={isAdmin} />}
       />
     </main>
   )

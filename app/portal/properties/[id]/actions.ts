@@ -37,3 +37,52 @@ export async function updateProperty(id: string, updates: Record<string, any>) {
   revalidatePath(`/portal/properties/${id}`)
   return { ok: true }
 }
+
+export async function saveContact(
+  propertyId: string,
+  contact: {
+    id?: string
+    name: string
+    role: string
+    phone: string
+    email: string
+    is_primary: boolean
+    notes: string
+  }
+) {
+  const supabase = await createClient()
+
+  // Enforce a single primary per property: if this one is primary, clear the others
+  if (contact.is_primary) {
+    await supabase
+      .from('property_contacts')
+      .update({ is_primary: false })
+      .eq('property_id', propertyId)
+  }
+
+  const payload = {
+    property_id: propertyId,
+    name: contact.name.trim(),
+    role: contact.role.trim() || null,
+    phone: contact.phone.trim() || null,
+    email: contact.email.trim() || null,
+    is_primary: contact.is_primary,
+    notes: contact.notes.trim() || null,
+  }
+
+  const { error } = contact.id
+    ? await supabase.from('property_contacts').update(payload).eq('id', contact.id)
+    : await supabase.from('property_contacts').insert(payload)
+
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/properties/${propertyId}`)
+  return { ok: true }
+}
+
+export async function deleteContact(propertyId: string, contactId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('property_contacts').delete().eq('id', contactId)
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/properties/${propertyId}`)
+  return { ok: true }
+}

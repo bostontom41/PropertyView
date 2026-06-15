@@ -5,9 +5,11 @@ import { useState, ReactNode } from 'react'
 export default function PropertyTabs({
   overview,
   tickets,
+  contacts,
 }: {
   overview: ReactNode
   tickets: ReactNode
+  contacts: ReactNode
 }) {
   const [tab, setTab] = useState<'overview' | 'tickets' | 'contacts' | 'attachments'>('overview')
 
@@ -38,11 +40,7 @@ export default function PropertyTabs({
       <div className="mt-6">
         {tab === 'overview' && overview}
         {tab === 'tickets' && tickets}
-        {tab === 'contacts' && (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
-            Contacts — coming soon
-          </div>
-        )}
+        {tab === 'contacts' && contacts}
         {tab === 'attachments' && (
           <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
             Attachments — coming soon
