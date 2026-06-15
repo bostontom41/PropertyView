@@ -6,10 +6,12 @@ export default function PropertyTabs({
   overview,
   tickets,
   contacts,
+  attachments,
 }: {
   overview: ReactNode
   tickets: ReactNode
   contacts: ReactNode
+  attachments: ReactNode
 }) {
   const [tab, setTab] = useState<'overview' | 'tickets' | 'contacts' | 'attachments'>('overview')
 
@@ -41,11 +43,7 @@ export default function PropertyTabs({
         {tab === 'overview' && overview}
         {tab === 'tickets' && tickets}
         {tab === 'contacts' && contacts}
-        {tab === 'attachments' && (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
-            Attachments — coming soon
-          </div>
-        )}
+        {tab === 'attachments' && attachments}
       </div>
     </div>
   )

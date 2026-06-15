@@ -86,3 +86,55 @@ export async function deleteContact(propertyId: string, contactId: string) {
   revalidatePath(`/portal/properties/${propertyId}`)
   return { ok: true }
 }
+
+export async function uploadAttachment(
+  propertyId: string,
+  file: { name: string; type: string; size: number; base64: string }
+) {
+  const supabase = await createClient()
+
+  const { data: claims } = await supabase.auth.getClaims()
+  const userId = claims?.claims?.sub ?? null
+
+  const buffer = Buffer.from(file.base64, 'base64')
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const path = `${propertyId}/${Date.now()}-${safeName}`
+
+  const { error: upErr } = await supabase.storage
+    .from('property-documents')
+    .upload(path, buffer, { contentType: file.type })
+
+  if (upErr) return { error: upErr.message }
+
+  const { error: dbErr } = await supabase.from('property_attachments').insert({
+    property_id: propertyId,
+    file_name: file.name,
+    storage_path: path,
+    file_type: file.type || null,
+    file_size: file.size || null,
+    uploaded_by: userId,
+  })
+
+  if (dbErr) return { error: dbErr.message }
+
+  revalidatePath(`/portal/properties/${propertyId}`)
+  return { ok: true }
+}
+
+export async function getAttachmentUrl(storagePath: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase.storage
+    .from('property-documents')
+    .createSignedUrl(storagePath, 60 * 5) // valid 5 minutes
+  if (error) return { error: error.message }
+  return { url: data.signedUrl }
+}
+
+export async function deleteAttachment(propertyId: string, attachmentId: string, storagePath: string) {
+  const supabase = await createClient()
+  await supabase.storage.from('property-documents').remove([storagePath])
+  const { error } = await supabase.from('property_attachments').delete().eq('id', attachmentId)
+  if (error) return { error: error.message }
+  revalidatePath(`/portal/properties/${propertyId}`)
+  return { ok: true }
+}

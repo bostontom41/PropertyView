@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth'
 import PhotoUpload from './photo-upload'
 import OverviewTab from './overview'
 import ContactsTab from './contacts'
+import AttachmentsTab from './attachments'
 import PropertyTabs from './tabs'
 import { TicketLink } from '../../drawer-context'
 
@@ -50,6 +51,12 @@ export default async function PropertyDetailPage({
     .eq('property_id', id)
     .order('is_primary', { ascending: false })
     .order('name')
+
+  const { data: attachments } = await supabase
+    .from('property_attachments')
+    .select('id, file_name, storage_path, file_type, file_size, created_at')
+    .eq('property_id', id)
+    .order('created_at', { ascending: false })
 
   const open = (tickets ?? []).filter((t) => t.status !== 'resolved').length
 
@@ -125,6 +132,7 @@ export default async function PropertyDetailPage({
         overview={<OverviewTab property={property} canEdit={isAdmin} />}
         tickets={ticketsContent}
         contacts={<ContactsTab propertyId={property.id} contacts={contacts ?? []} canManage={isAdmin} />}
+        attachments={<AttachmentsTab propertyId={property.id} attachments={attachments ?? []} canManage={isAdmin} />}
       />
     </main>
   )
