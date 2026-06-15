@@ -167,14 +167,14 @@ function SubmitForm() {
               Submitted — report {result.reportId}
             </p>
             <div className="mt-3 flex justify-center gap-2">
-              {propertyId && (
-                
-                  href={`/portal/properties/${propertyId}`}
-                  className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover"
-                >
-                  View Property
-                </a>
-              )}
+            {propertyId && (
+                <a
+                href={`/portal/properties/${propertyId}`}
+                className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover"
+              >
+                View Property
+              </a>
+            )}
               <button
                 type="button"
                 onClick={() => setResult(null)}

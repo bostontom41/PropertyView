@@ -103,7 +103,7 @@ export default async function PropertyDetailPage({
           <p className="mt-1 text-sm text-gray-500">{property.address}</p>
           <div className="mt-3 flex items-center gap-2">
             <Link
-              href={`/submit?property=${property.id}`}
+              href={`/portal/submit?property=${property.id}`}
               className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover"
             >
               + New Submission
