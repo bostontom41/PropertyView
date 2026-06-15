@@ -23,7 +23,6 @@ const OPERATIONS: { href: string; label: string; icon: LucideIcon; exact?: boole
 
 const CONFIGURE_PLACEHOLDERS: { label: string; icon: LucideIcon }[] = [
   { label: 'Routing Rules', icon: GitBranch },
-  { label: 'Team & Roles', icon: Users },
   { label: 'Reports', icon: BarChart3 },
   { label: 'Settings', icon: Settings },
 ]
@@ -85,7 +84,10 @@ export default function Sidebar({ email, role, name }: { email: string | null; r
         </div>
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Configure</div>
-          {CONFIGURE_PLACEHOLDERS.map((p) => placeholder(p.label, p.icon))}
+          {placeholder('Routing Rules', GitBranch)}
+          {navItem('/portal/team', 'Team & Roles', Users)}
+          {placeholder('Reports', BarChart3)}
+          {placeholder('Settings', Settings)}
         </div>
       </nav>
 
