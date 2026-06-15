@@ -21,6 +21,8 @@ type Property = {
   roof_age: string | null
   mechanical_age: string | null
   after_hours_contact: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 const inputCls = 'mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-900'
@@ -82,6 +84,8 @@ export default function OverviewTab({ property, canEdit }: { property: Property;
       roof_age: form.roof_age,
       mechanical_age: form.mechanical_age,
       after_hours_contact: form.after_hours_contact,
+      latitude: form.latitude,
+      longitude: form.longitude,
     })
     setBusy(false)
     setEditing(false)
@@ -112,6 +116,8 @@ export default function OverviewTab({ property, canEdit }: { property: Property;
           <Row label="Regional Manager" value={property.regional_manager_name} />
           <Row label="Regional Manager Email" value={property.regional_manager_email} />
           <Row label="After-Hours Contact" value={property.after_hours_contact} />
+          <Row label="Latitude" value={property.latitude} />
+          <Row label="Longitude" value={property.longitude} />
         </dl>
       </div>
     )
@@ -138,6 +144,8 @@ export default function OverviewTab({ property, canEdit }: { property: Property;
         <Field label="Regional Manager" value={form.regional_manager_name ?? ''} onChange={(v) => set('regional_manager_name', v)} />
         <Field label="Regional Manager Email" type="email" value={form.regional_manager_email ?? ''} onChange={(v) => set('regional_manager_email', v)} />
         <Field label="After-Hours Contact" value={form.after_hours_contact ?? ''} onChange={(v) => set('after_hours_contact', v)} />
+        <Field label="Latitude" type="number" value={(form.latitude as any) ?? ''} onChange={(v) => set('latitude', v as any)} />
+        <Field label="Longitude" type="number" value={(form.longitude as any) ?? ''} onChange={(v) => set('longitude', v as any)} />
       </div>
       <div className="mt-5 flex gap-2">
         <button onClick={save} disabled={busy} className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-hover disabled:opacity-50">

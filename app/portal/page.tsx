@@ -1,6 +1,7 @@
 import { formatFiled } from '@/lib/format'
 import { createClient } from '@/lib/supabase/server'
 import { TicketLink } from './drawer-context'
+import MapLoader from './map/map-loader'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,7 +10,6 @@ const STATUS_STYLE: Record<string, string> = {
   in_progress: 'bg-amber-100 text-amber-700',
   bid_process: 'bg-teal-100 text-teal-700',
   resolved: 'bg-green-100 text-green-700',
-  
 }
 const PRIORITY_STYLE: Record<string, string> = {
   high: 'bg-red-100 text-red-700',
@@ -25,21 +25,34 @@ export default async function DashboardPage() {
     .select('report_id, title, priority, status, created_at, property_id')
     .order('created_at', { ascending: false })
 
-  const { data: props } = await supabase.from('properties').select('id, name')
-  const propName = new Map((props ?? []).map((p) => [p.id, p.name]))
-  const { data: feedEvents } = await supabase
-  .from('submission_notes')
-  .select('id, kind, body, created_at, submission_id')
-  .in('kind', ['creation', 'status_change', 'assignment_change'])
-  .order('created_at', { ascending: false })
-  .limit(15)
-
-// Map submission_id → report_id + title for display
-const { data: subIndex } = await supabase
-  .from('submissions')
-  .select('id, report_id, title')
-const subInfo = new Map((subIndex ?? []).map((s) => [s.id, s]))
   const all = subs ?? []
+
+  const { data: props } = await supabase.from('properties').select('id, name, address, latitude, longitude')
+  const propName = new Map((props ?? []).map((p) => [p.id, p.name]))
+
+  const { data: feedEvents } = await supabase
+    .from('submission_notes')
+    .select('id, kind, body, created_at, submission_id')
+    .in('kind', ['creation', 'status_change', 'assignment_change'])
+    .order('created_at', { ascending: false })
+    .limit(15)
+
+  // Map submission_id → report_id + title for the feed
+  const { data: subIndex } = await supabase.from('submissions').select('id, report_id, title')
+  const subInfo = new Map((subIndex ?? []).map((s) => [s.id, s]))
+
+  // Open-issue counts per property for the mini-map
+  const openCountByProp = new Map<string, number>()
+  for (const s of all) if (s.status !== 'resolved') openCountByProp.set(s.property_id, (openCountByProp.get(s.property_id) ?? 0) + 1)
+
+  const mapProperties = (props ?? [])
+    .filter((p) => p.latitude != null && p.longitude != null)
+    .map((p) => ({
+      id: p.id, name: p.name, address: p.address,
+      latitude: p.latitude as number, longitude: p.longitude as number,
+      openCount: openCountByProp.get(p.id) ?? 0,
+    }))
+
   const kpis = [
     { label: 'Open Submissions', value: all.filter((s) => s.status !== 'resolved').length },
     { label: 'High Priority Open', value: all.filter((s) => s.priority === 'high' && s.status !== 'resolved').length },
@@ -92,7 +105,7 @@ const subInfo = new Map((subIndex ?? []).map((s) => [s.id, s]))
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                    <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'}`}>
+                      <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLE[s.status] ?? 'bg-gray-100 text-gray-600'}`}>
                         {s.status.replace('_', ' ')}
                       </span>
                     </td>
@@ -110,11 +123,15 @@ const subInfo = new Map((subIndex ?? []).map((s) => [s.id, s]))
         {/* RIGHT: rail */}
         <div className="space-y-6">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <h2 className="font-semibold">Property Map</h2>
-            <div className="mt-3 flex h-48 items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-400">
-              Map — coming next
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold">Property Map</h2>
+              <a href="/portal/map" className="text-xs text-brand hover:underline">Full map →</a>
+            </div>
+            <div className="mt-3">
+              <MapLoader properties={mapProperties} height="240px" zoom={6} />
             </div>
           </div>
+
           <div className="rounded-xl border border-gray-200 bg-white p-4">
             <div className="flex items-center justify-between">
               <h2 className="font-semibold">Activity Feed</h2>

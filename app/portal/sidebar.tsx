@@ -80,7 +80,7 @@ export default function Sidebar({ email, role, name }: { email: string | null; r
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Operations</div>
           {OPERATIONS.map((i) => navItem(i.href, i.label, i.icon, i.exact))}
-          {placeholder('Map View', Map)}
+          {navItem('/portal/map', 'Map View', Map)}
         </div>
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Configure</div>
