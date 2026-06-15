@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { notifyNewSubmission } from '@/lib/notify'
 
 export async function createSubmission(formData: {
   title: string
@@ -65,6 +66,6 @@ export async function createSubmission(formData: {
       return { reportId, photoError: upErr.message }
     }
   }
-
+  await notifyNewSubmission(submissionId)
   return { reportId }
 }

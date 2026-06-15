@@ -84,7 +84,7 @@ export default function Sidebar({ email, role, name }: { email: string | null; r
         </div>
         <div className="space-y-1">
           <div className="px-3 pb-1 text-[11px] font-medium uppercase tracking-wider text-white/40">Configure</div>
-          {placeholder('Routing Rules', GitBranch)}
+          {navItem('/portal/routing', 'Routing Rules', GitBranch)}
           {navItem('/portal/team', 'Team & Roles', Users)}
           {placeholder('Reports', BarChart3)}
           {placeholder('Settings', Settings)}
