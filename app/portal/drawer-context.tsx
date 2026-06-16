@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { formatFiled } from '@/lib/format'
+import PhotoGallery from '@/app/components/photo-gallery'
+import AddPhotos from '@/app/components/add-photos'
 
 type DrawerContextType = { open: (reportId: string) => void; close: () => void }
 const DrawerContext = createContext<DrawerContextType | null>(null)
@@ -81,8 +83,8 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
       {children}
       {reportId && (
         <>
-          <div onClick={() => setReportId(null)} className="fixed inset-0 z-40 bg-black/30 transition-opacity duration-300" />
-          <div className="fixed right-0 top-0 z-50 flex h-full w-full max-w-xl flex-col overflow-y-auto bg-white shadow-2xl animate-[slideIn_0.3s_ease-out]">
+          <div onClick={() => setReportId(null)} className="fixed inset-0 z-[1000] bg-black/30 transition-opacity duration-300" />
+          <div className="fixed right-0 top-0 z-[1001] flex h-full w-full max-w-xl flex-col overflow-y-auto bg-white shadow-2xl animate-[slideIn_0.3s_ease-out]">
             <div className="flex items-center justify-between border-b border-gray-200 p-4">
               <h2 className="font-semibold">{reportId}</h2>
               <button onClick={() => setReportId(null)} className="rounded-lg px-2 py-1 text-sm text-gray-500 hover:bg-gray-100">✕ Close</button>
@@ -108,6 +110,16 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
                     <div className="col-span-2"><dt className="text-gray-500">Location</dt><dd>{s.location ?? '—'}</dd></div>
                   </dl>
 
+                  {/* Photos */}
+                  <div className="mt-6 flex items-center justify-between">
+                    <h4 className="text-sm font-semibold">Photos</h4>
+                    <AddPhotos reportId={reportId} onDone={() => load(reportId)} />
+                  </div>
+                  <div className="mt-2">
+                    <PhotoGallery photos={data.photos ?? []} />
+                  </div>
+
+                  {/* Triage */}
                   <div className="mt-6 rounded-lg border border-gray-200 p-4">
                     <h4 className="text-sm font-semibold">Triage</h4>
                     <div className="mt-3 text-xs text-gray-500">Status</div>
@@ -135,6 +147,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
                     </button>
                   </div>
 
+                  {/* Activity */}
                   <h4 className="mt-6 text-sm font-semibold">Activity</h4>
                   <ul className="mt-3 space-y-3">
                     {(data.notes ?? []).map((n: any) => (

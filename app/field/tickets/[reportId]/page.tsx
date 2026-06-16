@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { formatFiled } from '@/lib/format'
 import PhotoGallery from '@/app/components/photo-gallery'
+import AddPhotos from '@/app/components/add-photos'
 
 const STATUS_STYLE: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
@@ -70,7 +71,10 @@ export default function FieldTicketPage() {
             <div className="col-span-2"><dt className="text-gray-500">Description</dt><dd className="whitespace-pre-wrap">{s.notes ?? '—'}</dd></div>
           </dl>
 
-          <h2 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">Photos</h2>
+          <div className="mt-6 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Photos</h2>
+            <AddPhotos reportId={reportId} onDone={load} />
+          </div>
           <div className="mt-2">
             <PhotoGallery photos={data.photos ?? []} />
           </div>

@@ -37,7 +37,7 @@ export default function LoginPage() {
       setStatus('error')
       setMessage(error.message)
     } else {
-      router.push('/')
+      window.location.href = '/'
     }
   }
 
