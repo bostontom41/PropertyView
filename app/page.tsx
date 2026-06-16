@@ -9,10 +9,10 @@ export default async function Home() {
   // Not logged in → login page
   if (!user) redirect('/login')
 
-  // Manager and above → web portal; Field → mobile submissions list
+  // Manager and above → web portal; Field → mobile field home
   if (canAccessPortal(user.role)) {
     redirect('/portal')
   } else {
-    redirect('/submissions')
+    redirect('/field')
   }
 }
