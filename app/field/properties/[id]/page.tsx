@@ -91,7 +91,7 @@ export default async function FieldPropertyPage({ params }: { params: Promise<{ 
       <h2 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">Recent Tickets</h2>
       <div className="mt-2 space-y-2">
         {(tickets ?? []).map((t) => (
-          <div key={t.report_id} className="rounded-lg border border-gray-200 bg-white p-3">
+          <Link key={t.report_id} href={`/field/tickets/${t.report_id}`} className="block rounded-lg border border-gray-200 bg-white p-3 active:bg-gray-50">
             <div className="flex items-center justify-between gap-2">
               <span className="font-medium text-gray-900">{t.title}</span>
               <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-xs capitalize ${STATUS_STYLE[t.status] ?? 'bg-gray-100 text-gray-600'}`}>
@@ -101,7 +101,7 @@ export default async function FieldPropertyPage({ params }: { params: Promise<{ 
             <div className="mt-1 text-xs text-gray-500">
               {t.report_id} · {t.issue_type} · {t.priority} · {formatFiled(t.created_at)}
             </div>
-          </div>
+          </Link>
         ))}
         {(tickets ?? []).length === 0 && (
           <p className="text-sm text-gray-400">No tickets yet for this property.</p>
