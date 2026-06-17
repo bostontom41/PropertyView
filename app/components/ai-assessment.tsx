@@ -78,18 +78,24 @@ export default function AiAssessment({
 
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
 
-      {latest ? (
+      {busy && (
+        <div className="mt-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-300 border-t-amber-600" />
+          <span className="text-sm text-amber-800">Analyzing photos… this takes a few seconds.</span>
+        </div>
+      )}
+
+      {!busy && latest && (
         <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <p className="text-[11px] font-medium uppercase tracking-wide text-amber-700">
             AI Assessment — advisory only
           </p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{latest.body}</p>
         </div>
-      ) : (
-        !busy &&
-        hasPhotos && (
-          <p className="mt-2 text-xs text-gray-400">No assessment yet — tap Analyze Photos to generate one.</p>
-        )
+      )}
+
+      {!busy && !latest && hasPhotos && (
+        <p className="mt-2 text-xs text-gray-400">No assessment yet — tap Analyze Photos to generate one.</p>
       )}
     </div>
   )
