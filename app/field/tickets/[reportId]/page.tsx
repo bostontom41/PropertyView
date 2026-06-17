@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { formatFiled } from '@/lib/format'
 import PhotoGallery from '@/app/components/photo-gallery'
 import AddPhotos from '@/app/components/add-photos'
+import AiAssessment from '@/app/components/ai-assessment'
 
 const STATUS_STYLE: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
@@ -79,9 +80,17 @@ export default function FieldTicketPage() {
             <PhotoGallery photos={data.photos ?? []} />
           </div>
 
+          <AiAssessment
+            reportId={reportId}
+            notes={data.notes ?? []}
+            photoCount={(data.photos ?? []).length}
+            autoAnalyze
+            onDone={load}
+          />
+
           <h2 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">Activity</h2>
           <ul className="mt-2 space-y-2">
-            {(data.notes ?? []).map((n: any) => (
+          {(data.notes ?? []).filter((n: any) => n.kind !== 'ai_assessment').map((n: any) => (
               <li key={n.id} className="rounded-lg border border-gray-200 bg-white p-3">
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>{n.kind === 'creation' ? 'Reported' : n.kind === 'comment' ? 'Note' : n.kind.replace('_', ' ')}</span>

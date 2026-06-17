@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { formatFiled } from '@/lib/format'
 import PhotoGallery from '@/app/components/photo-gallery'
 import AddPhotos from '@/app/components/add-photos'
+import AiAssessment from '@/app/components/ai-assessment'
 
 type DrawerContextType = { open: (reportId: string) => void; close: () => void }
 const DrawerContext = createContext<DrawerContextType | null>(null)
@@ -119,6 +120,14 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
                     <PhotoGallery photos={data.photos ?? []} />
                   </div>
 
+                  {/* AI Assessment */}
+                  <AiAssessment
+                    reportId={reportId}
+                    notes={data.notes ?? []}
+                    photoCount={(data.photos ?? []).length}
+                    onDone={() => load(reportId)}
+                  />
+
                   {/* Triage */}
                   <div className="mt-6 rounded-lg border border-gray-200 p-4">
                     <h4 className="text-sm font-semibold">Triage</h4>
@@ -150,7 +159,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
                   {/* Activity */}
                   <h4 className="mt-6 text-sm font-semibold">Activity</h4>
                   <ul className="mt-3 space-y-3">
-                    {(data.notes ?? []).map((n: any) => (
+                  {(data.notes ?? []).filter((n: any) => n.kind !== 'ai_assessment').map((n: any) => (
                       <li key={n.id} className="rounded-lg border border-gray-200 p-3">
                         <div className="flex items-center justify-between text-xs text-gray-500">
                           <span>{n.kind === 'creation' ? 'Ticket created' : 'Note'} · {data.authorEmail?.[n.author_id] ?? 'Unknown'}</span>
